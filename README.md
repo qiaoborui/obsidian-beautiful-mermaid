@@ -38,7 +38,7 @@ bun run build
 Copy these files into:
 
 ```text
-<vault>/.obsidian/plugins/obsidian-beautiful-mermaid/
+<vault>/.obsidian/plugins/beautiful-mermaid/
 ```
 
 Required files:

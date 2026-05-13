@@ -1,11 +1,10 @@
 {
-  "id": "obsidian-beautiful-mermaid",
+  "id": "beautiful-mermaid",
   "name": "Beautiful Mermaid",
   "version": "0.1.0",
   "minAppVersion": "1.5.0",
   "description": "Render Mermaid diagrams with beautiful-mermaid SVG output and Obsidian theme variables.",
-  "author": "Craft Agents OSS",
-  "authorUrl": "https://github.com/lukilabs/craft-agents-oss",
+  "author": "qiaoborui",
+  "authorUrl": "https://github.com/qiaoborui",
   "isDesktopOnly": false
 }
-
