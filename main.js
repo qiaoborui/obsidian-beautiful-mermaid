@@ -97436,6 +97436,9 @@ var MermaidPreviewModal = class extends import_obsidian.Modal {
     this.translate = { x: 0, y: 0 };
     this.dragging = false;
     this.activePointerId = null;
+    this.pointers = /* @__PURE__ */ new Map();
+    this.pinchDistance = null;
+    this.pinchCenter = null;
     this.lastPoint = { x: 0, y: 0 };
     this.contentElRef = null;
   }
@@ -97476,20 +97479,26 @@ var MermaidPreviewModal = class extends import_obsidian.Modal {
       this.zoomBy(event.deltaY < 0 ? 1.08 : 0.92);
     }, { passive: false });
     viewport.addEventListener("pointerdown", (event) => {
-      if (!event.isPrimary || event.pointerType === "mouse" && event.button !== 0) return;
+      if (event.pointerType === "mouse" && event.button !== 0) return;
       event.preventDefault();
-      this.activePointerId = event.pointerId;
-      this.dragging = true;
-      this.lastPoint = { x: event.clientX, y: event.clientY };
+      const point = this.eventPoint(event);
+      this.pointers.set(event.pointerId, point);
       viewport.setPointerCapture(event.pointerId);
+      this.updateGestureState(event.pointerId, point);
       viewport.addClass("is-dragging");
     });
     viewport.addEventListener("pointermove", (event) => {
-      if (!this.dragging || event.pointerId !== this.activePointerId) return;
+      if (!this.pointers.has(event.pointerId)) return;
       event.preventDefault();
-      this.translate.x += event.clientX - this.lastPoint.x;
-      this.translate.y += event.clientY - this.lastPoint.y;
-      this.lastPoint = { x: event.clientX, y: event.clientY };
+      const point = this.eventPoint(event);
+      this.pointers.set(event.pointerId, point);
+      if (this.pointers.size >= 2) {
+        this.updatePinch();
+      } else if (this.dragging && event.pointerId === this.activePointerId) {
+        this.translate.x += point.x - this.lastPoint.x;
+        this.translate.y += point.y - this.lastPoint.y;
+        this.lastPoint = point;
+      }
       this.applyTransform();
     });
     viewport.addEventListener("pointerup", (event) => this.endDrag(viewport, event.pointerId));
@@ -97499,9 +97508,10 @@ var MermaidPreviewModal = class extends import_obsidian.Modal {
   onClose() {
     this.contentEl.empty();
     this.contentElRef = null;
+    this.pointers.clear();
   }
   zoomBy(multiplier) {
-    this.scale = Math.max(0.25, Math.min(4, this.scale * multiplier));
+    this.scale = this.clampScale(this.scale * multiplier);
     this.applyTransform();
   }
   reset() {
@@ -97510,13 +97520,22 @@ var MermaidPreviewModal = class extends import_obsidian.Modal {
     this.applyTransform();
   }
   endDrag(viewport, pointerId) {
-    if (pointerId !== void 0 && pointerId !== this.activePointerId) return;
-    if (this.activePointerId !== null && viewport.hasPointerCapture(this.activePointerId)) {
-      viewport.releasePointerCapture(this.activePointerId);
+    if (pointerId !== void 0) {
+      this.pointers.delete(pointerId);
     }
-    this.activePointerId = null;
-    this.dragging = false;
-    viewport.removeClass("is-dragging");
+    if (pointerId !== void 0 && viewport.hasPointerCapture(pointerId)) {
+      viewport.releasePointerCapture(pointerId);
+    }
+    this.pinchDistance = null;
+    this.pinchCenter = null;
+    if (this.pointers.size > 0) {
+      const nextPointer = this.pointers.entries().next().value;
+      this.activePointerId = nextPointer[0];
+      this.dragging = true;
+      this.lastPoint = nextPointer[1];
+      return;
+    }
+    this.stopGesture(viewport);
   }
   applyTransform() {
     var _a2;
@@ -97524,6 +97543,57 @@ var MermaidPreviewModal = class extends import_obsidian.Modal {
       "transform",
       `translate(${this.translate.x}px, ${this.translate.y}px) scale(${this.scale})`
     );
+  }
+  eventPoint(event) {
+    return { x: event.clientX, y: event.clientY };
+  }
+  updateGestureState(pointerId, point) {
+    if (this.pointers.size >= 2) {
+      this.activePointerId = null;
+      this.dragging = false;
+      const [first, second] = this.getFirstTwoPointers();
+      this.pinchDistance = this.distance(first, second);
+      this.pinchCenter = this.midpoint(first, second);
+      return;
+    }
+    this.activePointerId = pointerId;
+    this.dragging = true;
+    this.lastPoint = point;
+    this.pinchDistance = null;
+    this.pinchCenter = null;
+  }
+  updatePinch() {
+    const [first, second] = this.getFirstTwoPointers();
+    const nextDistance = this.distance(first, second);
+    const nextCenter = this.midpoint(first, second);
+    if (this.pinchDistance !== null && this.pinchDistance > 0 && this.pinchCenter !== null) {
+      this.translate.x += nextCenter.x - this.pinchCenter.x;
+      this.translate.y += nextCenter.y - this.pinchCenter.y;
+      this.scale = this.clampScale(this.scale * (nextDistance / this.pinchDistance));
+    }
+    this.pinchDistance = nextDistance;
+    this.pinchCenter = nextCenter;
+  }
+  stopGesture(viewport) {
+    this.activePointerId = null;
+    this.dragging = false;
+    viewport.removeClass("is-dragging");
+  }
+  getFirstTwoPointers() {
+    const values = Array.from(this.pointers.values());
+    return [values[0], values[1]];
+  }
+  distance(first, second) {
+    return Math.hypot(second.x - first.x, second.y - first.y);
+  }
+  midpoint(first, second) {
+    return {
+      x: (first.x + second.x) / 2,
+      y: (first.y + second.y) / 2
+    };
+  }
+  clampScale(scale) {
+    return Math.max(0.25, Math.min(4, scale));
   }
 };
 var BeautifulMermaidPlugin = class extends import_obsidian.Plugin {
