@@ -1,8 +1,8 @@
-# Beautiful Mermaid for Obsidian
+# Beautiful Mermaid Renderer for Obsidian
 
 An Obsidian plugin that renders Mermaid diagrams with `beautiful-mermaid` SVG output and Obsidian theme variables.
 
-![Beautiful Mermaid for Obsidian preview](assets/preview-flow.svg)
+![Beautiful Mermaid Renderer for Obsidian preview](assets/preview-flow.svg)
 
 Inspired by Craft's [Beautiful Mermaid gallery](https://agents.craft.do/mermaid) and powered by [`lukilabs/beautiful-mermaid`](https://github.com/lukilabs/beautiful-mermaid).
 
@@ -47,7 +47,7 @@ Required files:
 - `main.js`
 - `styles.css`
 
-Enable **Beautiful Mermaid** from Obsidian settings.
+Enable **Beautiful Mermaid Renderer** from Obsidian settings.
 
 Reading view and Live Preview are both supported. In Live Preview, move the cursor outside the code block to see the rendered diagram; use the hover **Edit** button to reveal the source again.
 

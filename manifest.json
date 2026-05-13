@@ -1,6 +1,6 @@
 {
   "id": "beautiful-mermaid-renderer",
-  "name": "Beautiful Mermaid",
+  "name": "Beautiful Mermaid Renderer",
   "version": "0.1.0",
   "minAppVersion": "1.5.0",
   "description": "Render Mermaid diagrams with beautiful-mermaid SVG output and Obsidian theme variables.",
