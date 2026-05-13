@@ -318,6 +318,7 @@ class MermaidPreviewModal extends Modal {
   private scale = 1
   private translate = { x: 0, y: 0 }
   private dragging = false
+  private activePointerId: number | null = null
   private lastPoint = { x: 0, y: 0 }
   private contentElRef: HTMLElement | null = null
 
@@ -368,20 +369,28 @@ class MermaidPreviewModal extends Modal {
       event.preventDefault()
       this.zoomBy(event.deltaY < 0 ? 1.08 : 0.92)
     }, { passive: false })
-    viewport.onmousedown = (event) => {
+    viewport.addEventListener('pointerdown', (event) => {
+      if (!event.isPrimary || (event.pointerType === 'mouse' && event.button !== 0)) return
+
+      event.preventDefault()
+      this.activePointerId = event.pointerId
       this.dragging = true
       this.lastPoint = { x: event.clientX, y: event.clientY }
+      viewport.setPointerCapture(event.pointerId)
       viewport.addClass('is-dragging')
-    }
-    viewport.onmousemove = (event) => {
-      if (!this.dragging) return
+    })
+    viewport.addEventListener('pointermove', (event) => {
+      if (!this.dragging || event.pointerId !== this.activePointerId) return
+
+      event.preventDefault()
       this.translate.x += event.clientX - this.lastPoint.x
       this.translate.y += event.clientY - this.lastPoint.y
       this.lastPoint = { x: event.clientX, y: event.clientY }
       this.applyTransform()
-    }
-    viewport.onmouseup = () => this.endDrag(viewport)
-    viewport.onmouseleave = () => this.endDrag(viewport)
+    })
+    viewport.addEventListener('pointerup', (event) => this.endDrag(viewport, event.pointerId))
+    viewport.addEventListener('pointercancel', (event) => this.endDrag(viewport, event.pointerId))
+    viewport.addEventListener('lostpointercapture', (event) => this.endDrag(viewport, event.pointerId))
   }
 
   onClose() {
@@ -400,7 +409,13 @@ class MermaidPreviewModal extends Modal {
     this.applyTransform()
   }
 
-  private endDrag(viewport: HTMLElement) {
+  private endDrag(viewport: HTMLElement, pointerId?: number) {
+    if (pointerId !== undefined && pointerId !== this.activePointerId) return
+
+    if (this.activePointerId !== null && viewport.hasPointerCapture(this.activePointerId)) {
+      viewport.releasePointerCapture(this.activePointerId)
+    }
+    this.activePointerId = null
     this.dragging = false
     viewport.removeClass('is-dragging')
   }
