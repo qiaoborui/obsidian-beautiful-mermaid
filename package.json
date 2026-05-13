@@ -10,6 +10,7 @@
   },
   "type": "module",
   "scripts": {
+    "assets": "bun scripts/generate-assets.ts",
     "build": "tsc --noEmit --skipLibCheck && node esbuild.config.mjs --production",
     "dev": "node esbuild.config.mjs",
     "typecheck": "tsc --noEmit --skipLibCheck"
