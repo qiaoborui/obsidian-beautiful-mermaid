@@ -97248,6 +97248,16 @@ function renderBeautifulMermaid(source) {
     interactive: true
   });
 }
+function appendSvg(host, svg) {
+  host.empty();
+  const parser = new DOMParser();
+  const parsed = parser.parseFromString(svg, "image/svg+xml");
+  const svgElement = parsed.documentElement;
+  if (svgElement.nodeName.toLowerCase() !== "svg") {
+    throw new Error("Mermaid renderer returned invalid SVG");
+  }
+  host.appendChild(host.doc.importNode(svgElement, true));
+}
 function renderFallback(el, source, error) {
   el.empty();
   el.addClass("beautiful-mermaid-error");
@@ -97299,7 +97309,7 @@ function fillBeautifulMermaidBlock(container, source, minReadableHeight, fitToWi
   const scroller = container.createDiv({ cls: "beautiful-mermaid-scroll" });
   const content = scroller.createDiv({ cls: "beautiful-mermaid-content" });
   const svgHost = content.createDiv({ cls: "beautiful-mermaid-svg" });
-  svgHost.innerHTML = svg;
+  appendSvg(svgHost, svg);
   const resizeObserver = fitRenderedDiagram(container, content, svgHost, svg, minReadableHeight, fitToWidth, onResize);
   const actions = container.createDiv({ cls: "beautiful-mermaid-actions" });
   if (onEdit) {
@@ -97376,7 +97386,7 @@ var MermaidEditorWidget = class extends import_view.WidgetType {
     return this.source === other.source && this.minReadableHeight === other.minReadableHeight && this.fitToWidth === other.fitToWidth && this.from === other.from && this.to === other.to;
   }
   toDOM(view) {
-    const container = document.createElement("div");
+    const container = view.dom.doc.createElement("div");
     try {
       fillBeautifulMermaidBlock(container, this.source, this.minReadableHeight, this.fitToWidth, (svg) => {
         new MermaidPreviewModal(this.app, svg, this.source).open();
@@ -97468,7 +97478,7 @@ var MermaidPreviewModal = class extends import_obsidian.Modal {
     });
     const viewport = contentEl.createDiv({ cls: "beautiful-mermaid-modal-viewport" });
     const svgHost = viewport.createDiv({ cls: "beautiful-mermaid-modal-svg" });
-    svgHost.innerHTML = this.svg;
+    appendSvg(svgHost, this.svg);
     this.contentElRef = svgHost;
     this.applyTransform();
     viewport.onClickEvent((event) => {
@@ -97645,7 +97655,7 @@ var BeautifulMermaidSettingTab = class extends import_obsidian.PluginSettingTab 
   display() {
     const { containerEl } = this;
     containerEl.empty();
-    containerEl.createEl("h2", { text: "Beautiful Mermaid" });
+    new import_obsidian.Setting(containerEl).setName("Beautiful Mermaid").setHeading();
     new import_obsidian.Setting(containerEl).setName("Code block languages").setDesc("Comma-separated fence languages handled by this plugin.").addText((text) => {
       text.setPlaceholder(DEFAULT_LANGUAGES.join(", ")).setValue(this.plugin.settings.languages.join(", ")).onChange(async (value) => {
         this.plugin.settings.languages = normalizeLanguages(value);

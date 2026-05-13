@@ -74,6 +74,19 @@ function renderBeautifulMermaid(source: string): string {
   })
 }
 
+function appendSvg(host: HTMLElement, svg: string) {
+  host.empty()
+
+  const parser = new DOMParser()
+  const parsed = parser.parseFromString(svg, 'image/svg+xml')
+  const svgElement = parsed.documentElement
+  if (svgElement.nodeName.toLowerCase() !== 'svg') {
+    throw new Error('Mermaid renderer returned invalid SVG')
+  }
+
+  host.appendChild(host.doc.importNode(svgElement, true))
+}
+
 function renderFallback(el: HTMLElement, source: string, error: unknown) {
   el.empty()
   el.addClass('beautiful-mermaid-error')
@@ -153,7 +166,7 @@ function fillBeautifulMermaidBlock(
   const scroller = container.createDiv({ cls: 'beautiful-mermaid-scroll' })
   const content = scroller.createDiv({ cls: 'beautiful-mermaid-content' })
   const svgHost = content.createDiv({ cls: 'beautiful-mermaid-svg' })
-  svgHost.innerHTML = svg
+  appendSvg(svgHost, svg)
   const resizeObserver = fitRenderedDiagram(container, content, svgHost, svg, minReadableHeight, fitToWidth, onResize)
 
   const actions = container.createDiv({ cls: 'beautiful-mermaid-actions' })
@@ -259,7 +272,7 @@ class MermaidEditorWidget extends WidgetType {
   }
 
   toDOM(view: EditorView): HTMLElement {
-    const container = document.createElement('div')
+    const container = view.dom.doc.createElement('div')
     try {
       fillBeautifulMermaidBlock(container, this.source, this.minReadableHeight, this.fitToWidth, (svg) => {
         new MermaidPreviewModal(this.app, svg, this.source).open()
@@ -366,7 +379,7 @@ class MermaidPreviewModal extends Modal {
 
     const viewport = contentEl.createDiv({ cls: 'beautiful-mermaid-modal-viewport' })
     const svgHost = viewport.createDiv({ cls: 'beautiful-mermaid-modal-svg' })
-    svgHost.innerHTML = this.svg
+    appendSvg(svgHost, this.svg)
     this.contentElRef = svgHost
     this.applyTransform()
 
@@ -576,7 +589,9 @@ class BeautifulMermaidSettingTab extends PluginSettingTab {
     const { containerEl } = this
     containerEl.empty()
 
-    containerEl.createEl('h2', { text: 'Beautiful Mermaid' })
+    new Setting(containerEl)
+      .setName('Beautiful Mermaid')
+      .setHeading()
 
     new Setting(containerEl)
       .setName('Code block languages')
