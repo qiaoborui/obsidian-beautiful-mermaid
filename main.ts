@@ -73,6 +73,26 @@ function normalizeTheme(value: unknown): BeautifulMermaidTheme {
   return OBSIDIAN_THEME_VALUE
 }
 
+function normalizeSettings(data: unknown): BeautifulMermaidSettings {
+  if (!data || typeof data !== 'object') return DEFAULT_SETTINGS
+
+  const saved = data as Partial<Record<keyof BeautifulMermaidSettings, unknown>>
+  const languages = Array.isArray(saved.languages)
+    ? saved.languages.filter((language): language is string => typeof language === 'string')
+    : DEFAULT_SETTINGS.languages
+
+  return {
+    languages: Array.from(new Set(['mermaid', ...languages])),
+    minReadableHeight: typeof saved.minReadableHeight === 'number'
+      ? saved.minReadableHeight
+      : DEFAULT_SETTINGS.minReadableHeight,
+    fitToWidth: typeof saved.fitToWidth === 'boolean'
+      ? saved.fitToWidth
+      : DEFAULT_SETTINGS.fitToWidth,
+    theme: normalizeTheme(saved.theme),
+  }
+}
+
 function getThemeLabel(value: BeautifulMermaidTheme): string {
   if (value === OBSIDIAN_THEME_VALUE) return 'Obsidian colors'
   return value
@@ -624,12 +644,7 @@ export default class BeautifulMermaidPlugin extends Plugin {
   }
 
   async loadSettings() {
-    const loaded = Object.assign({}, DEFAULT_SETTINGS, await this.loadData())
-    this.settings = {
-      ...loaded,
-      languages: Array.from(new Set(['mermaid', ...loaded.languages])),
-      theme: normalizeTheme(loaded.theme),
-    }
+    this.settings = normalizeSettings(await this.loadData())
   }
 
   async saveSettings() {

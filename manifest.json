@@ -1,7 +1,7 @@
 {
   "id": "beautiful-mermaid-renderer",
   "name": "Beautiful Mermaid Renderer",
-  "version": "0.1.3",
+  "version": "0.2.0",
   "minAppVersion": "1.5.0",
   "description": "Render Mermaid diagrams with beautiful-mermaid SVG output and theme variables.",
   "author": "qiaoborui",

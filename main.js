@@ -97345,6 +97345,17 @@ function normalizeTheme(value) {
   }
   return OBSIDIAN_THEME_VALUE;
 }
+function normalizeSettings(data) {
+  if (!data || typeof data !== "object") return DEFAULT_SETTINGS;
+  const saved = data;
+  const languages = Array.isArray(saved.languages) ? saved.languages.filter((language) => typeof language === "string") : DEFAULT_SETTINGS.languages;
+  return {
+    languages: Array.from(/* @__PURE__ */ new Set(["mermaid", ...languages])),
+    minReadableHeight: typeof saved.minReadableHeight === "number" ? saved.minReadableHeight : DEFAULT_SETTINGS.minReadableHeight,
+    fitToWidth: typeof saved.fitToWidth === "boolean" ? saved.fitToWidth : DEFAULT_SETTINGS.fitToWidth,
+    theme: normalizeTheme(saved.theme)
+  };
+}
 function getThemeLabel(value) {
   if (value === OBSIDIAN_THEME_VALUE) return "Obsidian colors";
   return value.split("-").map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join(" ");
@@ -97783,12 +97794,7 @@ var BeautifulMermaidPlugin = class extends import_obsidian.Plugin {
     }
   }
   async loadSettings() {
-    const loaded = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
-    this.settings = {
-      ...loaded,
-      languages: Array.from(/* @__PURE__ */ new Set(["mermaid", ...loaded.languages])),
-      theme: normalizeTheme(loaded.theme)
-    };
+    this.settings = normalizeSettings(await this.loadData());
   }
   async saveSettings() {
     await this.saveData(this.settings);
