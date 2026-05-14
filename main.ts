@@ -9,12 +9,34 @@ import {
   PluginSettingTab,
   Setting,
 } from 'obsidian'
-import { renderMermaidSVG } from 'beautiful-mermaid'
+import { renderMermaidSVG, THEMES } from 'beautiful-mermaid'
+import type { RenderOptions } from 'beautiful-mermaid'
 import { EditorState, RangeSetBuilder, StateField } from '@codemirror/state'
 import { Decoration, DecorationSet, EditorView, WidgetType } from '@codemirror/view'
 
 const DEFAULT_LANGUAGES = ['mermaid', 'mermaid-beautiful', 'beautiful-mermaid', 'bmmd']
 const CODE_BLOCK_PROCESSOR_SORT_ORDER = -100
+const OBSIDIAN_THEME_VALUE = 'obsidian'
+const THEME_OPTIONS = [
+  OBSIDIAN_THEME_VALUE,
+  'zinc-light',
+  'zinc-dark',
+  'tokyo-night',
+  'tokyo-night-storm',
+  'tokyo-night-light',
+  'catppuccin-mocha',
+  'catppuccin-latte',
+  'nord',
+  'nord-light',
+  'dracula',
+  'github-light',
+  'github-dark',
+  'solarized-light',
+  'solarized-dark',
+  'one-dark',
+] as const
+
+type BeautifulMermaidTheme = typeof THEME_OPTIONS[number]
 
 interface Point {
   x: number
@@ -25,12 +47,14 @@ interface BeautifulMermaidSettings {
   languages: string[]
   minReadableHeight: number
   fitToWidth: boolean
+  theme: BeautifulMermaidTheme
 }
 
 const DEFAULT_SETTINGS: BeautifulMermaidSettings = {
   languages: DEFAULT_LANGUAGES,
   minReadableHeight: 260,
   fitToWidth: true,
+  theme: OBSIDIAN_THEME_VALUE,
 }
 
 function normalizeLanguages(value: string): string[] {
@@ -40,6 +64,21 @@ function normalizeLanguages(value: string): string[] {
     .filter(Boolean)
 
   return Array.from(new Set(languages.length > 0 ? languages : DEFAULT_LANGUAGES))
+}
+
+function normalizeTheme(value: unknown): BeautifulMermaidTheme {
+  if (typeof value === 'string' && THEME_OPTIONS.includes(value as BeautifulMermaidTheme)) {
+    return value as BeautifulMermaidTheme
+  }
+  return OBSIDIAN_THEME_VALUE
+}
+
+function getThemeLabel(value: BeautifulMermaidTheme): string {
+  if (value === OBSIDIAN_THEME_VALUE) return 'Obsidian colors'
+  return value
+    .split('-')
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ')
 }
 
 function parseSvgDimensions(svgString: string): { width: number; height: number } | null {
@@ -60,8 +99,20 @@ function stripMermaidFence(source: string): string {
   return lines.join('\n').trim()
 }
 
-function renderBeautifulMermaid(source: string): string {
-  return renderMermaidSVG(stripMermaidFence(source), {
+function getRenderOptions(theme: BeautifulMermaidTheme): RenderOptions {
+  const baseOptions = {
+    transparent: true,
+    interactive: true,
+  } satisfies RenderOptions
+
+  if (theme !== OBSIDIAN_THEME_VALUE) {
+    return {
+      ...THEMES[theme],
+      ...baseOptions,
+    }
+  }
+
+  return {
     bg: 'var(--background-primary, #f7f7f8)',
     fg: 'var(--text-normal, #16171d)',
     accent: 'var(--beautiful-mermaid-accent, #8b7bd8)',
@@ -69,8 +120,13 @@ function renderBeautifulMermaid(source: string): string {
     muted: 'var(--text-muted, #7c7d85)',
     surface: 'var(--beautiful-mermaid-surface, #ece9f8)',
     border: 'var(--beautiful-mermaid-border, #d8d8df)',
-    transparent: true,
-    interactive: true,
+    ...baseOptions,
+  }
+}
+
+function renderBeautifulMermaid(source: string, theme: BeautifulMermaidTheme): string {
+  return renderMermaidSVG(stripMermaidFence(source), {
+    ...getRenderOptions(theme),
   })
 }
 
@@ -155,6 +211,7 @@ function fillBeautifulMermaidBlock(
   source: string,
   minReadableHeight: number,
   fitToWidth: boolean,
+  theme: BeautifulMermaidTheme,
   onOpen: (svg: string) => void,
   onEdit?: () => void,
   onResize?: () => void,
@@ -162,7 +219,7 @@ function fillBeautifulMermaidBlock(
   container.empty()
   container.addClass('beautiful-mermaid-block')
 
-  const svg = renderBeautifulMermaid(source)
+  const svg = renderBeautifulMermaid(source, theme)
   const scroller = container.createDiv({ cls: 'beautiful-mermaid-scroll' })
   const content = scroller.createDiv({ cls: 'beautiful-mermaid-content' })
   const svgHost = content.createDiv({ cls: 'beautiful-mermaid-svg' })
@@ -257,6 +314,7 @@ class MermaidEditorWidget extends WidgetType {
     private readonly source: string,
     private readonly minReadableHeight: number,
     private readonly fitToWidth: boolean,
+    private readonly theme: BeautifulMermaidTheme,
     private readonly from: number,
     private readonly to: number,
   ) {
@@ -267,6 +325,7 @@ class MermaidEditorWidget extends WidgetType {
     return this.source === other.source &&
       this.minReadableHeight === other.minReadableHeight &&
       this.fitToWidth === other.fitToWidth &&
+      this.theme === other.theme &&
       this.from === other.from &&
       this.to === other.to
   }
@@ -274,7 +333,7 @@ class MermaidEditorWidget extends WidgetType {
   toDOM(view: EditorView): HTMLElement {
     const container = view.dom.doc.createElement('div')
     try {
-      fillBeautifulMermaidBlock(container, this.source, this.minReadableHeight, this.fitToWidth, (svg) => {
+      fillBeautifulMermaidBlock(container, this.source, this.minReadableHeight, this.fitToWidth, this.theme, (svg) => {
         new MermaidPreviewModal(this.app, svg, this.source).open()
       }, () => {
         view.dispatch({
@@ -314,7 +373,7 @@ function createMermaidEditorExtension(app: App, getSettings: () => BeautifulMerm
         Decoration.widget({
           block: true,
           side: -1,
-              widget: new MermaidEditorWidget(app, fence.source, settings.minReadableHeight, settings.fitToWidth, fence.from, fence.to),
+          widget: new MermaidEditorWidget(app, fence.source, settings.minReadableHeight, settings.fitToWidth, settings.theme, fence.from, fence.to),
         }),
       )
       builder.add(fence.from, fence.to, Decoration.replace({ block: true }))
@@ -555,7 +614,7 @@ export default class BeautifulMermaidPlugin extends Plugin {
     el.addClass('beautiful-mermaid-block')
 
     try {
-      const resizeObserver = fillBeautifulMermaidBlock(el, source, this.settings.minReadableHeight, this.settings.fitToWidth, (svg) => {
+      const resizeObserver = fillBeautifulMermaidBlock(el, source, this.settings.minReadableHeight, this.settings.fitToWidth, this.settings.theme, (svg) => {
         new MermaidPreviewModal(this.app, svg, source).open()
       })
       if (resizeObserver) ctx.addChild(new ResizeObserverRenderChild(el, resizeObserver))
@@ -569,6 +628,7 @@ export default class BeautifulMermaidPlugin extends Plugin {
     this.settings = {
       ...loaded,
       languages: Array.from(new Set(['mermaid', ...loaded.languages])),
+      theme: normalizeTheme(loaded.theme),
     }
   }
 
@@ -602,6 +662,21 @@ class BeautifulMermaidSettingTab extends PluginSettingTab {
           .setValue(this.plugin.settings.languages.join(', '))
           .onChange(async (value) => {
             this.plugin.settings.languages = normalizeLanguages(value)
+            await this.plugin.saveSettings()
+          })
+      })
+
+    new Setting(containerEl)
+      .setName('Diagram theme')
+      .setDesc('Use Obsidian CSS variables, or choose a built-in beautiful-mermaid theme.')
+      .addDropdown((dropdown) => {
+        for (const theme of THEME_OPTIONS) {
+          dropdown.addOption(theme, getThemeLabel(theme))
+        }
+        dropdown
+          .setValue(this.plugin.settings.theme)
+          .onChange(async (value) => {
+            this.plugin.settings.theme = normalizeTheme(value)
             await this.plugin.saveSettings()
           })
       })
