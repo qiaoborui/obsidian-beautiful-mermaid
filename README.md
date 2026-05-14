@@ -2,9 +2,34 @@
 
 An Obsidian plugin that renders Mermaid diagrams with `beautiful-mermaid` SVG output and Obsidian theme variables.
 
-![Beautiful Mermaid Renderer for Obsidian preview](assets/preview-flow.svg)
-
 Inspired by Craft's [Beautiful Mermaid gallery](https://agents.craft.do/mermaid) and powered by [`lukilabs/beautiful-mermaid`](https://github.com/lukilabs/beautiful-mermaid).
+
+<table>
+  <tr>
+    <td width="50%">
+      <img src="assets/gallery-flow.svg" alt="Theme-aware Mermaid flowchart rendered in Obsidian" />
+      <br />
+      <sub><strong>Theme-aware diagrams</strong></sub>
+    </td>
+    <td width="50%">
+      <img src="assets/gallery-xy-bar.svg" alt="XY bar chart rendered with Beautiful Mermaid" />
+      <br />
+      <sub><strong>XY bar charts</strong></sub>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%">
+      <img src="assets/gallery-xy-combo.svg" alt="Combined bar and line chart rendered with Beautiful Mermaid" />
+      <br />
+      <sub><strong>Bar + line combinations</strong></sub>
+    </td>
+    <td width="50%">
+      <img src="assets/gallery-xy-horizontal.svg" alt="Horizontal XY bar chart rendered with Beautiful Mermaid" />
+      <br />
+      <sub><strong>Horizontal charts</strong></sub>
+    </td>
+  </tr>
+</table>
 
 ## Usage
 

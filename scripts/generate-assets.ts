@@ -21,6 +21,41 @@ const theme = {
 
 const diagrams = [
   {
+    fileName: 'gallery-flow.svg',
+    source: `graph LR
+  source[Mermaid code block] --> render[Beautiful Mermaid renderer]
+  render --> theme[Theme-aware SVG]
+  theme --> reading[Reading view]
+  theme --> live[Live Preview]
+  live --> zoom[Zoom and pan]
+  live --> mobile[Mobile gestures]`,
+  },
+  {
+    fileName: 'gallery-xy-bar.svg',
+    source: `xychart-beta
+  title "Monthly Notes Created"
+  x-axis [Jan, Feb, Mar, Apr, May, Jun]
+  y-axis "Notes" 0 --> 500
+  bar [180, 250, 310, 280, 350, 420]`,
+  },
+  {
+    fileName: 'gallery-xy-combo.svg',
+    source: `xychart-beta
+  title "Research Output with Trend"
+  x-axis [Q1, Q2, Q3, Q4]
+  y-axis "Items" 0 --> 220
+  bar [52, 88, 128, 168]
+  line [48, 96, 118, 196]`,
+  },
+  {
+    fileName: 'gallery-xy-horizontal.svg',
+    source: `xychart-beta horizontal
+  title "Diagram Types Used"
+  x-axis [Flowchart, Sequence, ER, Class, XY]
+  y-axis "Uses" 0 --> 40
+  bar [36, 28, 22, 18, 14]`,
+  },
+  {
     fileName: 'preview-flow.svg',
     source: `graph LR
   A[Obsidian Mermaid fence] --> B[Beautiful Mermaid renderer]
@@ -54,4 +89,3 @@ for (const diagram of diagrams) {
   writeFileSync(join(assetsDir, diagram.fileName), svg)
   console.log(`wrote assets/${diagram.fileName}`)
 }
-
