@@ -191,9 +191,41 @@ function fitRenderedDiagram(
   container.style.setProperty('--beautiful-mermaid-natural-width', `${dims.width}px`)
   container.style.setProperty('--beautiful-mermaid-natural-height', `${dims.height}px`)
   container.style.setProperty('--beautiful-mermaid-min-height', `${minReadableHeight}px`)
+  const svgElement = svgHost.querySelector('svg')
+
+  const getContainerWidth = () => {
+    const width = container.clientWidth ||
+      container.getBoundingClientRect().width ||
+      container.parentElement?.clientWidth ||
+      container.closest<HTMLElement>('.export-image-root')?.clientWidth ||
+      container.closest<HTMLElement>('.markdown-preview-view')?.clientWidth ||
+      content.parentElement?.clientWidth ||
+      0
+
+    return Math.floor(width)
+  }
+
+  const applySize = (width: number, height: number, containerWidth: number) => {
+    const widthPx = `${width}px`
+    const heightPx = `${height}px`
+
+    content.style.width = widthPx
+    content.style.height = heightPx
+    content.style.margin = width <= containerWidth ? '0 auto' : '0'
+    svgHost.style.width = widthPx
+    svgHost.style.height = heightPx
+    svgHost.style.transform = ''
+
+    if (svgElement) {
+      svgElement.setAttr('width', String(width))
+      svgElement.setAttr('height', String(height))
+      svgElement.style.setProperty('width', widthPx)
+      svgElement.style.setProperty('height', heightPx)
+    }
+  }
 
   const update = () => {
-    const containerWidth = container.clientWidth
+    const containerWidth = getContainerWidth()
     if (!containerWidth) return
 
     const fitToContainerScale = containerWidth / dims.width
@@ -213,16 +245,17 @@ function fitRenderedDiagram(
     const scaledWidth = dims.width * scale
     const scaledHeight = dims.height * scale
 
-    content.style.width = `${scaledWidth}px`
-    content.style.height = `${scaledHeight}px`
-    content.style.margin = scaledWidth <= containerWidth ? '0 auto' : '0'
-    svgHost.style.transform = scale === 1 ? '' : `scale(${scale})`
+    applySize(scaledWidth, scaledHeight, containerWidth)
     onResize?.()
   }
 
   update()
+  container.win.requestAnimationFrame(update)
+  container.win.setTimeout(update, 50)
+  container.win.setTimeout(update, 250)
   const observer = new ResizeObserver(update)
   observer.observe(container)
+  if (container.parentElement) observer.observe(container.parentElement)
   return observer
 }
 
@@ -238,6 +271,8 @@ function fillBeautifulMermaidBlock(
 ): ResizeObserver | null {
   container.empty()
   container.addClass('beautiful-mermaid-block')
+  container.toggleClass('is-fit-to-width', fitToWidth)
+  container.toggleClass('is-readable-height', !fitToWidth)
 
   const svg = renderBeautifulMermaid(source, theme)
   const scroller = container.createDiv({ cls: 'beautiful-mermaid-scroll' })

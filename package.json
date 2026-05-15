@@ -1,6 +1,6 @@
 {
   "name": "obsidian-beautiful-mermaid",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "private": true,
   "description": "Render Obsidian Mermaid diagrams with beautiful-mermaid SVG output.",
   "license": "Apache-2.0",

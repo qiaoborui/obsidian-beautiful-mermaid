@@ -32,6 +32,7 @@
 }
 
 .beautiful-mermaid-svg svg {
+  display: block;
   flex: 0 0 auto;
   max-width: none;
 }
@@ -138,4 +139,87 @@
 
 .beautiful-mermaid-modal-svg svg {
   max-width: none;
+}
+
+.export-image-root .beautiful-mermaid-block.is-fit-to-width .beautiful-mermaid-scroll,
+.export-image-preview-root .beautiful-mermaid-block.is-fit-to-width .beautiful-mermaid-scroll {
+  overflow: visible !important;
+  mask-image: none !important;
+  -webkit-mask-image: none !important;
+}
+
+.export-image-root .beautiful-mermaid-block.is-fit-to-width .beautiful-mermaid-content,
+.export-image-preview-root .beautiful-mermaid-block.is-fit-to-width .beautiful-mermaid-content {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  height: auto !important;
+  margin: 0 auto !important;
+}
+
+.export-image-root .beautiful-mermaid-block.is-fit-to-width .beautiful-mermaid-svg,
+.export-image-preview-root .beautiful-mermaid-block.is-fit-to-width .beautiful-mermaid-svg {
+  width: 100% !important;
+  height: auto !important;
+  transform: none !important;
+}
+
+.export-image-root .beautiful-mermaid-block.is-fit-to-width .beautiful-mermaid-svg svg,
+.export-image-preview-root .beautiful-mermaid-block.is-fit-to-width .beautiful-mermaid-svg svg {
+  width: 100% !important;
+  max-width: 100% !important;
+  height: auto !important;
+}
+
+.export-image-root .beautiful-mermaid-actions,
+.export-image-preview-root .beautiful-mermaid-actions,
+.export-image-root .beautiful-mermaid-svg .xychart-tip,
+.export-image-preview-root .beautiful-mermaid-svg .xychart-tip {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+}
+
+@media print {
+  .beautiful-mermaid-block {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .beautiful-mermaid-scroll {
+    overflow: visible !important;
+    mask-image: none !important;
+    -webkit-mask-image: none !important;
+  }
+
+  .beautiful-mermaid-content {
+    min-width: 0 !important;
+    max-width: 100% !important;
+    height: auto !important;
+    margin: 0 auto !important;
+  }
+
+  .beautiful-mermaid-block.is-fit-to-width .beautiful-mermaid-content {
+    width: 100% !important;
+  }
+
+  .beautiful-mermaid-svg {
+    transform: none !important;
+  }
+
+  .beautiful-mermaid-svg svg {
+    max-width: 100% !important;
+    height: auto !important;
+  }
+
+  .beautiful-mermaid-block.is-fit-to-width .beautiful-mermaid-svg svg {
+    width: 100% !important;
+  }
+
+  .beautiful-mermaid-actions,
+  .beautiful-mermaid-svg .xychart-tip {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+  }
 }
