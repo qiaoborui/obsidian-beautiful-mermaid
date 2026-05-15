@@ -210,15 +210,11 @@ function fitRenderedDiagram(
     const heightPx = `${height}px`
     const margin = width <= containerWidth ? '0 auto' : '0'
 
-    content.setCssProps({
-      '--beautiful-mermaid-scaled-width': widthPx,
-      '--beautiful-mermaid-scaled-height': heightPx,
-      '--beautiful-mermaid-content-margin': margin,
-    })
-    svgHost.setCssProps({
-      '--beautiful-mermaid-scaled-width': widthPx,
-      '--beautiful-mermaid-scaled-height': heightPx,
-      '--beautiful-mermaid-svg-transform': 'none',
+    container.setCssProps({
+      '--beautiful-mermaid-rendered-width': widthPx,
+      '--beautiful-mermaid-rendered-height': heightPx,
+      '--beautiful-mermaid-rendered-margin': margin,
+      '--beautiful-mermaid-rendered-transform': 'none',
     })
 
     if (svgElement) {

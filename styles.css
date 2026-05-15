@@ -4,6 +4,10 @@
   --beautiful-mermaid-line: color-mix(in srgb, var(--text-normal) 34%, var(--background-primary));
   --beautiful-mermaid-surface: color-mix(in srgb, var(--interactive-accent) 12%, var(--background-primary));
   --beautiful-mermaid-border: color-mix(in srgb, var(--text-normal) 14%, var(--background-primary));
+  --beautiful-mermaid-layout-width: var(--beautiful-mermaid-rendered-width, auto);
+  --beautiful-mermaid-layout-height: var(--beautiful-mermaid-rendered-height, auto);
+  --beautiful-mermaid-layout-margin: var(--beautiful-mermaid-rendered-margin, 0);
+  --beautiful-mermaid-layout-transform: var(--beautiful-mermaid-rendered-transform, none);
   position: relative;
   margin: 1rem 0;
 }
@@ -24,24 +28,24 @@
 
 .beautiful-mermaid-content {
   position: relative;
-  width: var(--beautiful-mermaid-scaled-width, auto);
-  height: var(--beautiful-mermaid-scaled-height, auto);
-  margin: var(--beautiful-mermaid-content-margin, 0);
+  width: var(--beautiful-mermaid-layout-width);
+  height: var(--beautiful-mermaid-layout-height);
+  margin: var(--beautiful-mermaid-layout-margin);
   min-width: min(100%, var(--beautiful-mermaid-natural-width, 100%));
 }
 
 .beautiful-mermaid-svg {
-  width: var(--beautiful-mermaid-scaled-width, auto);
-  height: var(--beautiful-mermaid-scaled-height, auto);
-  transform: var(--beautiful-mermaid-svg-transform, none);
+  width: var(--beautiful-mermaid-layout-width);
+  height: var(--beautiful-mermaid-layout-height);
+  transform: var(--beautiful-mermaid-layout-transform);
   transform-origin: top left;
 }
 
 .beautiful-mermaid-svg svg {
   display: block;
   flex: 0 0 auto;
-  width: var(--beautiful-mermaid-scaled-width, auto);
-  height: var(--beautiful-mermaid-scaled-height, auto);
+  width: var(--beautiful-mermaid-layout-width);
+  height: var(--beautiful-mermaid-layout-height);
   max-width: none;
 }
 
@@ -196,6 +200,21 @@
 }
 
 @media print {
+  .beautiful-mermaid-block {
+    --beautiful-mermaid-layout-width: var(--beautiful-mermaid-rendered-width, auto);
+    --beautiful-mermaid-layout-height: var(--beautiful-mermaid-rendered-height, auto);
+    --beautiful-mermaid-layout-margin: var(--beautiful-mermaid-rendered-margin, 0 auto);
+    --beautiful-mermaid-layout-transform: none;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .beautiful-mermaid-block.is-fit-to-width {
+    --beautiful-mermaid-layout-width: 100%;
+    --beautiful-mermaid-layout-height: auto;
+    --beautiful-mermaid-layout-margin: 0 auto;
+  }
+
   .beautiful-mermaid-block .beautiful-mermaid-scroll {
     overflow: visible;
     mask-image: none;
