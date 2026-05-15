@@ -24,16 +24,24 @@
 
 .beautiful-mermaid-content {
   position: relative;
+  width: var(--beautiful-mermaid-scaled-width, auto);
+  height: var(--beautiful-mermaid-scaled-height, auto);
+  margin: var(--beautiful-mermaid-content-margin, 0);
   min-width: min(100%, var(--beautiful-mermaid-natural-width, 100%));
 }
 
 .beautiful-mermaid-svg {
+  width: var(--beautiful-mermaid-scaled-width, auto);
+  height: var(--beautiful-mermaid-scaled-height, auto);
+  transform: var(--beautiful-mermaid-svg-transform, none);
   transform-origin: top left;
 }
 
 .beautiful-mermaid-svg svg {
   display: block;
   flex: 0 0 auto;
+  width: var(--beautiful-mermaid-scaled-width, auto);
+  height: var(--beautiful-mermaid-scaled-height, auto);
   max-width: none;
 }
 
@@ -129,6 +137,13 @@
 }
 
 .beautiful-mermaid-modal-svg {
+  --beautiful-mermaid-modal-translate-x: 0px;
+  --beautiful-mermaid-modal-translate-y: 0px;
+  --beautiful-mermaid-modal-scale: 1;
+  transform: translate(
+    var(--beautiful-mermaid-modal-translate-x),
+    var(--beautiful-mermaid-modal-translate-y)
+  ) scale(var(--beautiful-mermaid-modal-scale));
   transform-origin: center center;
   transition: transform 120ms ease;
 }

@@ -208,19 +208,22 @@ function fitRenderedDiagram(
   const applySize = (width: number, height: number, containerWidth: number) => {
     const widthPx = `${width}px`
     const heightPx = `${height}px`
+    const margin = width <= containerWidth ? '0 auto' : '0'
 
-    content.style.width = widthPx
-    content.style.height = heightPx
-    content.style.margin = width <= containerWidth ? '0 auto' : '0'
-    svgHost.style.width = widthPx
-    svgHost.style.height = heightPx
-    svgHost.style.transform = ''
+    content.setCssProps({
+      '--beautiful-mermaid-scaled-width': widthPx,
+      '--beautiful-mermaid-scaled-height': heightPx,
+      '--beautiful-mermaid-content-margin': margin,
+    })
+    svgHost.setCssProps({
+      '--beautiful-mermaid-scaled-width': widthPx,
+      '--beautiful-mermaid-scaled-height': heightPx,
+      '--beautiful-mermaid-svg-transform': 'none',
+    })
 
     if (svgElement) {
       svgElement.setAttr('width', String(width))
       svgElement.setAttr('height', String(height))
-      svgElement.style.setProperty('width', widthPx)
-      svgElement.style.setProperty('height', heightPx)
     }
   }
 
@@ -577,10 +580,11 @@ class MermaidPreviewModal extends Modal {
   }
 
   private applyTransform() {
-    this.contentElRef?.style.setProperty(
-      'transform',
-      `translate(${this.translate.x}px, ${this.translate.y}px) scale(${this.scale})`,
-    )
+    this.contentElRef?.setCssProps({
+      '--beautiful-mermaid-modal-translate-x': `${this.translate.x}px`,
+      '--beautiful-mermaid-modal-translate-y': `${this.translate.y}px`,
+      '--beautiful-mermaid-modal-scale': String(this.scale),
+    })
   }
 
   private eventPoint(event: PointerEvent): Point {
