@@ -158,83 +158,79 @@
 
 .export-image-root .beautiful-mermaid-block.is-fit-to-width .beautiful-mermaid-scroll,
 .export-image-preview-root .beautiful-mermaid-block.is-fit-to-width .beautiful-mermaid-scroll {
-  overflow: visible !important;
-  mask-image: none !important;
-  -webkit-mask-image: none !important;
+  overflow: visible;
+  mask-image: none;
+  -webkit-mask-image: none;
 }
 
 .export-image-root .beautiful-mermaid-block.is-fit-to-width .beautiful-mermaid-content,
 .export-image-preview-root .beautiful-mermaid-block.is-fit-to-width .beautiful-mermaid-content {
-  width: 100% !important;
-  min-width: 0 !important;
-  max-width: 100% !important;
-  height: auto !important;
-  margin: 0 auto !important;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  height: auto;
+  margin: 0 auto;
 }
 
 .export-image-root .beautiful-mermaid-block.is-fit-to-width .beautiful-mermaid-svg,
 .export-image-preview-root .beautiful-mermaid-block.is-fit-to-width .beautiful-mermaid-svg {
-  width: 100% !important;
-  height: auto !important;
-  transform: none !important;
+  width: 100%;
+  height: auto;
+  transform: none;
 }
 
 .export-image-root .beautiful-mermaid-block.is-fit-to-width .beautiful-mermaid-svg svg,
 .export-image-preview-root .beautiful-mermaid-block.is-fit-to-width .beautiful-mermaid-svg svg {
-  width: 100% !important;
-  max-width: 100% !important;
-  height: auto !important;
+  width: 100%;
+  max-width: 100%;
+  height: auto;
 }
 
 .export-image-root .beautiful-mermaid-actions,
 .export-image-preview-root .beautiful-mermaid-actions,
 .export-image-root .beautiful-mermaid-svg .xychart-tip,
 .export-image-preview-root .beautiful-mermaid-svg .xychart-tip {
-  display: none !important;
-  visibility: hidden !important;
-  opacity: 0 !important;
+  display: none;
+  visibility: hidden;
+  opacity: 0;
 }
 
 @media print {
-  .beautiful-mermaid-block {
-    break-inside: avoid;
-    page-break-inside: avoid;
+  .beautiful-mermaid-block .beautiful-mermaid-scroll {
+    overflow: visible;
+    mask-image: none;
+    -webkit-mask-image: none;
   }
 
-  .beautiful-mermaid-scroll {
-    overflow: visible !important;
-    mask-image: none !important;
-    -webkit-mask-image: none !important;
-  }
-
-  .beautiful-mermaid-content {
-    min-width: 0 !important;
-    max-width: 100% !important;
-    height: auto !important;
-    margin: 0 auto !important;
+  .beautiful-mermaid-block .beautiful-mermaid-content {
+    min-width: 0;
+    max-width: 100%;
+    height: auto;
+    margin: 0 auto;
   }
 
   .beautiful-mermaid-block.is-fit-to-width .beautiful-mermaid-content {
-    width: 100% !important;
+    width: 100%;
   }
 
-  .beautiful-mermaid-svg {
-    transform: none !important;
+  .beautiful-mermaid-block .beautiful-mermaid-svg {
+    transform: none;
   }
 
-  .beautiful-mermaid-svg svg {
-    max-width: 100% !important;
-    height: auto !important;
+  .beautiful-mermaid-block .beautiful-mermaid-svg svg {
+    max-width: 100%;
+    height: auto;
   }
 
   .beautiful-mermaid-block.is-fit-to-width .beautiful-mermaid-svg svg {
-    width: 100% !important;
+    width: 100%;
   }
 
-  .beautiful-mermaid-actions,
-  .beautiful-mermaid-svg .xychart-tip {
-    display: none !important;
-    visibility: hidden !important;
-    opacity: 0 !important;
+  .beautiful-mermaid-block .beautiful-mermaid-actions,
+  .beautiful-mermaid-block:hover .beautiful-mermaid-actions,
+  .beautiful-mermaid-block .beautiful-mermaid-svg .xychart-tip {
+    display: none;
+    visibility: hidden;
+    opacity: 0;
   }
 }
